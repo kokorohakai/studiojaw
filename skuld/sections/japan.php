@@ -1,1 +1,0 @@
-This section may be deleted.. or may have random pictures of japanese products/stuff/craziness.<br>
