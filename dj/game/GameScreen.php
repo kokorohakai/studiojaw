@@ -1,3 +1,4 @@
+<img src="/dj/game/img/gamescreen.png" id="gs_bg" class="game_background">
 <?php
 	/*The reason this is being echo'd by php, is because I needed these elements to have no space between them, but still be human readable.*/
 	echo '<div id="gs_playfield">'.
@@ -40,3 +41,4 @@
 		</td>
 </table>
 <div id="gs_gameover" style="display:none">Game Over</div>
+

@@ -34,3 +34,11 @@
 	left:0px;
 	position:absolute;
 }
+img.game_background {
+	position:absolute;
+	left:0px;
+	top:0px;
+	width:800px;
+	height:600px;
+}
+

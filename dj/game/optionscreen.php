@@ -7,5 +7,6 @@ Options will include:
 */
 
 ?>
-
+<img src="/dj/game/img/optionscreen.png" id="os_bg" class="game_background">
 <div id="optionscreen_return" class="option">Return to Title Screen</div>
+
