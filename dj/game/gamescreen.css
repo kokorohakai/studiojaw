@@ -1,0 +1,145 @@
+#GameScreen {
+	background: #006;
+}
+
+#gs_playfield {
+	position:absolute;
+	top:10px;
+	left:10px;
+	height:570px;
+	width:500px;
+}
+#gs_playfield_ph{
+	position:relative;
+	width:100%;
+	height:100%;
+	border:3px solid #666;
+	overflow:hidden;
+}
+.gs_option {
+	position: absolute;
+	color:white;
+	font-weight:bold;
+	font-family:'Tahoma','Arial',sans-serif;
+	font-size:16px;
+	cursor:pointer;
+	text-shadow: 1px 1px 3px #white;	
+}
+.gs_option:hover{
+	color:#FF0;
+}
+#gs_return {
+	right:10px;
+	bottom:10px;
+}
+img.gs_note {
+	position:absolute;
+	border:1px solid white;
+	background:white;
+	width:125px;
+	height:15px;
+	z-index:1010;
+}
+img.note_0 {
+	left:0px;
+}
+img.note_1 {
+	left:125px;
+}
+img.note_2 {
+	left:250px;
+}
+img.note_3 {
+	left:375px;
+}
+div.gamebox {
+	position:absolute;
+	width:125px;
+	height:125px;
+	bottom:0px;
+	border:3px solid;
+	border-color:rgba(255,255,255,0.2);
+	z-index:1003;
+}
+#gs_pf_box_0 {
+	left:0px;
+}
+#gs_pf_box_1 {
+	left:125px;
+}
+#gs_pf_box_2 {
+	left:250px;
+}
+#gs_pf_box_3 {
+	left:375px;
+}
+#gs_debug {
+	position:absolute;
+	left:530px;
+	top:500px;
+	width:250px;
+	color:white;
+}
+#gs_player {
+	width:24px;
+	height:48px;
+	position:absolute;
+	left:-100px;
+	top:0px;	
+	z-index:1010;
+}
+#gs_playerZone {
+	width:100%;
+	height:125px;
+	position:absolute;
+	bottom:0px;
+	left:0px;
+	z-index:1100;
+	cursor:none;
+}
+#gs_table {
+	position:absolute;
+	left:516px;
+	top:10px;
+}
+
+#gs_table td.group {
+	color:#EEF;
+	font-weight:bold;
+	font-family:'Times New Roman',serif;
+	font-size:24px;
+	cursor:pointer;
+	text-shadow: 2px 2px 5px #CC00FF;	
+	text-align:right;
+	width:100px;
+}
+#gs_table td.right {
+	width:180px;
+}
+#gs_gameover {
+    font-family: 'Times New Roman',serif;
+    font-size: 40px;
+    left: 166px;
+    position: absolute;
+    text-shadow: 0 0 5px #FFFFFF;
+    top: 300px;
+    color: #999999;
+    z-index:1099;
+}
+#gs_score {
+	color:white;
+	font-family:monospace;
+	font-size:24px;
+	text-align:right;
+}
+img.background {
+	width:500px;
+	height:570px;
+	position:absolute;
+}
+img.bgbottom {
+	z-index: 1001;
+}
+img.bgtop {
+	z-index: 1002;
+}

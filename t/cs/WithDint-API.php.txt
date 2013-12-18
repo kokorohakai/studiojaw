@@ -1,0 +1,1575 @@
+<?php
+/*
+function reference:
+	Generates a stylish clickable button.
+	
+	HTML genbutton( INNERHTML, ONCLICK )
+
+		INNERHTML:
+			Usually a caption or a link using "a href"
+			
+		ONCLICK:
+			Optional, if specfied this action will be done when the button is clicked.
+*/
+function genbutton( $innerhtml, $onclick = "", $width=30 )
+{
+	$buttonid = uniqid("");
+	?>
+	<div class="button" onmouseover="changebutton('<?=$buttonid;?>','on');" onmouseout="changebutton('<?=$buttonid;?>','off');" onmousedown="changebutton('<?=$buttonid;?>','click');" onmouseup="changebutton('<?=$buttonid;?>','off');" id="<?=$buttonid?>" onclick="<?=$onclick?>" style="width:<?=($width+14)?>px;">
+		<div class="button" style="width:<?=($width+14)?>px;">
+			<table class="button" style="width:<?=($width+14)?>px;">
+				<tr>
+					<td class="buttonl" id="<?=$buttonid?>l">
+					</td>
+					<td class="buttonc" id="<?=$buttonid?>c" style="width:<?=$width?>px">
+						<?=$innerhtml?>
+					</td>
+					<td class="buttonr" id="<?=$buttonid?>r">
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<?
+}
+/*
+function reference:
+	Notify checks the notifications table and sees if the user accepts that type of notification. 
+	If they do, it will then send them an e-mail letting them know the action occured.
+	
+	void notify( USER, TYPE, MESSAGE )
+
+		USER:
+			A string with the username to check.
+			
+		TYPE:
+			The type currently there are: 
+				message
+				article
+				blog
+				file
+				scroll
+				friendrequest
+				grouprequest
+				comment (a reply to one of the previous)
+				
+		MESSAGE:
+			A string with the message to send to them.
+*/
+function notify( $username, $type, $message )
+{
+	if ( strlen($username) > 0 )
+	{
+		$sql = 'SELECT * FROM "Notifications" WHERE "username" = \''.$username.'\'';
+		$res = pg_exec($_SESSION['connection'],$sql);
+		if ($row = pg_fetch_array($res))
+		{
+			if ($row[$type]=='t')
+			{
+				$subject =  "With Dint Notification from ".$_SESSION['user'];
+				$content =	$message.
+							"\n\n".
+							"This message was sent from the With Dint notification system.\n".
+							"To disable this notification please visit one of our sites and access your control panel:\n\n".
+							"http://".$username.".withdtint.com/\n".
+							"http://news.withdtint.com/\n".
+							"http://scroll.withdtint.com/\n\n".
+							"Thanks!".
+							"~The With Dint staff";
+				$email = getemail($username);
+				sendemail( $email, $subject, $content );
+			}
+		}
+	}
+}
+/*
+function reference:
+	Checks if the user is in the administrators table of the database. Returns true or false
+	
+	bool isadmin( USER )
+
+		USER:
+			A string with the username to check.
+			
+*/
+function isadmin( $username )
+{
+	$sql = 'SELECT count("username") FROM "Admins" '."WHERE \"username\"='".$username."'";
+	$result = pg_exec($_SESSION['connection'], $sql);
+	$row = pg_fetch_array($result);
+	if ( $row['count'] > 0 )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}	
+}
+/*
+function reference:
+	Checks if the user is an editor.
+	
+	bool isadmin( USER )
+
+		USER:
+			A string with the username to check.
+			
+*/
+function iseditor( $username )
+{
+	$sql = 'SELECT sum("amount") FROM "Influence" WHERE "username" = \''.$username.'\';';
+	$result = pg_exec($_SESSION['connection'], $sql);
+	if ($row = pg_fetch_array($result) )
+	{
+		if ( $row['sum'] > 9000 )
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+/*
+function reference:
+	Adds influence to an item in the database.
+	
+	void addinf( TYPE, RID, AMOUNT, USER )
+
+		TYPE:
+			The type currently there are: 
+				message
+				article
+				blog
+				file
+				scroll
+				friendrequest
+				grouprequest
+				comment (a reply to one of the previous)
+
+		RID:
+			The id to the item.
+			
+		AMOUNT:
+			The amount in which to add or remove from the influence.
+							
+		USER:
+			A string with the username who the influence belongs to.
+			
+*/
+function addinf( $type, $rid, $n, $username )
+{
+	if (strlen($username) < 1) return;
+	if ( getap($_SESSION['user']) > 0 && $_SESSION['user'] != $username )
+	{
+		$n = intval($n);
+		$sql = 'SELECT "amount" FROM "Influence" WHERE "type" = \''.$type.'\' AND "RID" = \''.$rid.'\' AND "username" = \''.$username.'\'';
+		$res = pg_exec($_SESSION['connection'], $sql);
+		if ($row = pg_fetch_array($res) )
+		{
+			$n = intval($row['amount'])+$n;
+			$sql = 'UPDATE "Influence" SET "amount" = '.$n.' WHERE "type" = \''.$type.'\' AND "RID" = \''.$rid.'\' AND "username" = \''.$username.'\'';
+		}
+		else
+		{
+			$sql =  'INSERT INTO "Influence" ("type","RID","amount","username") VALUES'.
+					"('".$type."','".$rid."',".$n.",'".$username."');";
+		}
+		pg_exec($_SESSION['connection'],$sql);
+		subap($_SESSION['user']);
+	}		
+}
+/*
+function reference:
+	Returns how much influence an applications item has.
+	
+	void getappinf( TYPE, RID )
+
+		TYPE:
+			The type currently there are: 
+				message
+				article
+				blog
+				file
+				scroll
+				friendrequest
+				grouprequest
+				comment (a reply to one of the previous)
+
+		RID:
+			The id to the item.
+			
+			
+*/
+function getappinf( $type, $rid )
+{
+	$isql = 'SELECT sum("amount") AS inf FROM "Influence" WHERE "type" = \''.$type.'\' AND "RID" =\''.$rid.'\'';
+	$ires = pg_exec($_SESSION['connection'],$isql);
+	$inf = 0;
+	if ( $irow = pg_fetch_array($ires))
+	{
+		if (is_numeric($irow['inf']))
+		{
+			$inf = $irow['inf'];
+		}
+	}
+	return $inf;
+}
+/*
+function reference:
+	Adds an "attack point" to a user. Max 5.
+	
+	void addap( USER )
+
+		USER:
+			A string with the username to check.
+			
+*/
+function addap( $username )
+{
+	$ap=0;
+	$sql = 'SELECT "attackpoints" FROM "Users" WHERE "username" = \''.$username.'\';';
+	$result = pg_exec($_SESSION['connection'], $sql);
+	if ($row = pg_fetch_array($result) )
+	{
+		$ap = intval($row['attackpoints']);
+	}
+	$ap++;
+	if ( $ap > 5 )
+	{
+		$ap=5;
+	}
+	$sql='UPDATE "Users" SET "attackpoints"='.$ap.' WHERE "username" = \''.$username.'\';';
+	pg_exec($_SESSION['connection'], $sql);
+}
+/*
+function reference:
+	Subtracts an "attack point" to a user. Max 5.
+	
+	void subap( USER )
+
+		USER:
+			A string with the username to check.
+			
+*/
+function subap( $username )
+{
+	$ap=0;
+	$sql = 'SELECT "attackpoints" FROM "Users" WHERE "username" = \''.$username.'\';';
+	$result = pg_exec($_SESSION['connection'], $sql);
+	if ($row = pg_fetch_array($result) )
+	{
+		$ap = intval($row['attackpoints']);
+	}
+	$ap--;
+	if ( $ap < 0 )
+	{
+		$ap=0;
+	}
+	$sql='UPDATE "Users" SET "attackpoints"='.$ap.' WHERE "username" = \''.$username.'\';';
+	pg_exec($_SESSION['connection'],$sql);
+}
+/*
+function reference:
+	returns the amount of influence a user has.
+	
+	int getinf( USER )
+
+		USER:
+			A string with the username to check.
+			
+*/
+function getinf( $username )
+{
+	$sql = 'SELECT sum("amount") FROM "Influence" WHERE "username" = \''.$username.'\';';
+	$result = pg_exec($_SESSION['connection'], $sql);
+	if ($row = pg_fetch_array($result) )
+	{
+		return intval($row['sum']);
+	}
+	return 0;
+}
+/*
+function reference:
+	returns the amount of "attack points" a user has to effect influence
+	
+	int isadmin( USER )
+
+		USER:
+			A string with the username to check.
+			
+*/
+function getap( $username )
+{
+	$sql = 'SELECT "attackpoints" FROM "Users" WHERE "username" = \''.$_SESSION['user'].'\'';
+	$res = pg_exec($_SESSION['connection'],$sql);
+	if ($row = pg_fetch_array($res))
+	{
+		return $row['attackpoints'];
+	}
+	return 0;
+}
+
+/*
+function reference:
+	Generates a decorated for use on the withdint main page.
+	
+	string generateframe( TITLE, CONTENT, WIDTH (, HEIGHT) )
+
+		TITLE:
+			The title to appear in the frame.
+			
+		CONTENT:
+			The body of the decorated frame.
+		
+		WIDTH:
+			Sets the width of the frame.
+		
+		HEIGHT:
+			optional, sets the hight of the content in the frame.
+*/
+function generateframe($title,$content,$width,$height="100%")
+{
+$HTML=<<<HTML
+<table class="contentframe" style="width:{$width};">
+	<tr>
+		<td class="titleleft">
+		</td>
+		<td class="title">
+			{$title}
+		</td>
+		<td class="titleright">
+		</td>
+	</tr>
+	<tr>
+		<td class="barleft">
+		</td>
+		<td class="bar">
+			<img src="home/images/frame/bar.jpg" style="width:100%;height:2px;vertical-align:top;">
+		</td>
+		<td class="barright">
+		</td>
+	</tr>
+	<tr>
+		<td class="frameleft" style="height:{$height};">
+			<img src="home/images/frame/frameleft.jpg" alt="" style="width:5px;height:100%;">
+		</td>
+		<td class="content" style="padding:5px;" style="height:{$height};">
+			{$content}
+		</td>
+		<td class="frameright" style="height:{$height};">
+			<img src="home/images/frame/frameright.jpg" alt="" style="width:5px;height:100%;">
+		</td>
+	</tr>
+</table>
+HTML;
+return $HTML;
+}
+
+/*
+function reference:
+	Sends an E-mail to a arbitrary e-mail address.
+	
+	void sendemail( E-MAIL ADDRESS, SUBJECT, CONTENT )
+
+		E-MAIL ADDRESS:
+			The e-mail address to send too.
+			
+		SUBJECT:
+			The subject of the e-mail.
+			
+		CONTENT:
+			The body of the e-mail.
+*/
+function sendemail( $email, $subject, $content )
+{
+	$file="/tmp/WITHDINT-email".$_SESSION['key'];
+	if ( file_exists($file) )
+	{
+		unlink($file);
+	}
+	$fh = fopen($file,"w");
+	fwrite($fh, 'From: "With Dint Auto E-mail Service" <no-reply@withdint.com>'."\n");
+	fwrite($fh, 'To: <'.$email.'>'."\n");
+	fwrite($fh, 'Subject: '.$subject."\n");
+	fwrite($fh, 'From: "With Dint Auto E-mail Service" <no-reply@withdint.com>'."\n");
+	fwrite($fh, "\n");
+	fwrite($fh, $content."\n");
+	fclose($fh);
+	exec("cat ".$file." | sendmail -t");
+	unlink($file);
+}
+
+/*
+function reference:
+	Returns true if e-mail address looks legitimate. False if fake looking.
+	
+	bool valid_email( E-MAIL ADDRESS )
+
+		E-MAIL ADDRESS:
+			The e-mail address to check.
+			
+*/
+function valid_email( $email )
+{
+	$valid=true;
+	if ( count ( explode ( "@", $email ) ) != 2  )
+	{
+		$valid=false;
+	}
+	$ext = false;
+	$test = explode ( ".",$email);
+	$n = count( $test ) - 1;
+	//a list of valid US domain delegations
+	switch ( strtolower( $test[$n] ) )
+	{
+		case "org":
+			$ext=true;
+			break;
+		case "edu":
+			$ext=true;
+			break;
+		case "com":
+			$ext=true;
+			break;
+		case "info":
+			$ext=true;
+			break;
+		case "us":
+			$ext=true;
+			break;
+		case "gov":
+			$ext=true;
+			break;
+		case "jp":
+			$ext=true;
+			break;
+		case "net":
+			$ext=true;
+			break;
+		case "biz":
+			$ext=true;
+			break;
+		case "cc":
+			$ext=true;
+			break;
+	}
+	if (!$ext)
+	{
+		$valid=false;
+	}
+	return $valid;
+}
+/*
+function reference:
+	Returns true if the browser detected is Internet Explorer
+	
+	bool is_IE()
+
+		(no parameters)
+			
+*/
+
+function is_IE()
+{
+	$retval=false;
+	if ( isset($_SERVER['HTTP_USER_AGENT']) )
+	{ 
+		if ( strpos( $_SERVER['HTTP_USER_AGENT'] , 'MSIE' ) !== false )
+		{
+      $retval=true;
+    }
+  }    
+	return $retval;
+}
+/*
+function reference:
+	sanitize invalid characters for filenames
+	
+*/
+function sanitize( $str )
+{
+	//$str = preg_replace("[[\!\@\#\$\%\^\&\*\[\]\.,\\/]]","_",$str);
+	$str = str_replace("'","_",$str);
+	$str = str_replace("@","_",$str);
+	$str = str_replace("&","_",$str);
+	$str = str_replace("(","_",$str);
+	$str = str_replace(")","_",$str);
+	$str = str_replace('"',"_",$str);
+	$str = str_replace('/',"_",$str);
+	$str = str_replace("\\","_",$str);
+	$str = str_replace("..","_",$str);
+	$str = str_replace(" ","_",$str);
+	$str = stripslashes($str);
+	return $str;
+}
+/*
+function reference:
+	parses and cleans "section=" passed in from the url.
+	
+	void set_section( APPLICATION )
+
+		APPLICATION:
+			The name of the application setting the section.
+*/
+function set_section( $app )
+{
+	if ( strlen($app) > 0)
+	{
+		if (isset($_GET['section']))
+		{
+			$section = $_GET['section'];
+			$section = str_replace(".","",$section);
+			$section = str_replace("/","",$section);
+			$section = str_replace("\\","",$section);
+			$_SESSION[$app]['section'] = $section;
+		}
+		else
+		{
+			$_SESSION[$app]['section'] = "home";
+		}
+	}
+}
+/*
+function reference:
+	returns the current section for the application
+	
+	string get_section( APPLICATION )
+
+		APPLICATION:
+			The name of the application setting the section.
+*/
+function get_section( $app )
+{
+	if (isset($_SESSION[$app]['section']))
+	{
+		return $_SESSION[$app]['section'];
+	}
+	else
+	{
+		return "home";
+	}
+}
+/*
+function reference:
+	Returns message based on dint or not dint for number of messages.
+	
+	string unread_messages()
+*/
+function unread_messages()
+{
+	$return="";
+	if (isdint())
+	{
+		$sql = 	'SELECT COUNT("read") as count FROM "Comments" where '.
+						"dint = '".$_SESSION['dint']."' and app='messages' and read = false";
+		$result = pg_exec($_SESSION['connection'], $sql);
+		$row = pg_fetch_array($result);
+		if ($row['count'] > 0)
+		{
+			$return = $_SESSION['dint']."'s Messages <br><blink style='color:red;'>(".$row['count']." Unread)</blink>";
+		}
+		else
+		{
+				$return = $_SESSION['dint']."'s Messages";
+		}
+		$sql = 	'UPDATE "Users" SET "lastseen" = now() WHERE "username" = \''.$_SESSION['dint']."'";
+		$result = pg_exec($_SESSION['connection'], $sql);
+	}
+	else
+	{
+		$return="Leave ".$_SESSION['dint']." A Message";
+	}
+	return $return;
+}
+/*
+function reference:
+	returns just basic weather of the current DINT.
+	This will cause an update of the weather file if one of the following credentials are met:
+		
+		-update once per hour
+		-no file exists
+	
+	string get_weather(  )
+*/
+if (!isset($_SESSION['weathericon']))
+{
+	$_SESSION['weathericon']="";
+}
+function get_weather()
+{
+	if (is_app_installed("weather"))
+	{
+		$zipcode=get_def("weather_zipcode");
+		$update=false;
+		$file=$_SESSION['dint']."/weathercache";
+		$output="(Zip code not set)";
+		if ( file_exists($file) )
+		{
+			if ( date("ymdH",filemtime($file)) != date("ymdH"))
+			{
+				$update=true;
+			}
+		}
+		else
+		{
+			$update=true;
+		}
+		if ($update)
+		{
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, "http://rss.weather.com/weather/rss/local/".$zipcode."?cm_ven=LWO&cm_cat=rss&par=LWO_rss"); 
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+			$wdata = curl_exec($ch);
+			curl_close($ch);
+			
+			$fh = fopen( $file , "w" );
+			fwrite( $fh, $wdata, strlen( $wdata ) );
+			fclose( $fh );
+		}
+		
+		$weather = simplexml_load_file( $file, 'SimpleXMLElement', LIBXML_NOCDATA );
+		if ( !isset( $weather->err ) )
+		{
+			$data = explode( '"', $weather->channel->item[0]->description );
+			$datab= explode( "/", $data[1] );
+			$data = explode( '?' , $datab[ count($datab)-1] );
+			$_SESSION['weathericon']="home/Applications/weather/icons/".str_replace(".gif","",$data[0]).".png";
+			if (!file_exists($_SESSION['weathericon']))
+			{
+				$_SESSION['weathericon']="home/Applications/weather/icons/25.png";
+			}
+			$data = explode( "/>", $weather->channel->item[0]->description );
+			$data = explode( ". For", $data[1] );
+			$output = $data[0];
+		}
+		else
+		{
+			//the weather does not exist.
+			$_SESSION['weathericon'] = "";
+			$output="(Zip code not set)";
+		}
+		return $output;
+	}
+}
+/*
+function reference:
+	returns the weather icon of the current DINT. (get_weather must have been previously called.)
+	
+	string get_weather_icon(  )
+*/
+
+function get_weather_icon()
+{
+	if (is_app_installed("weather"))
+	{
+		return $_SESSION['weathericon'];
+	}
+}
+/*
+function reference:
+	returns the ini data for an application.
+	
+	string get_section( PATH, APPLICATION )
+
+		PATH:
+			Path to the application.
+			
+		APPLICATION:
+			The name of the application setting the section.
+*/
+function getinidata($path,$n)
+{
+	$data=array();
+	if (file_exists($path.$n.".ini"))
+	{
+		$fh = fopen($path.$n.".ini","r");
+		@$alldata=fread($fh,filesize($path.$n.".ini"));
+		fclose($fh);
+		$temp=explode("\n",$alldata);
+		foreach($temp as $d)
+		{
+			$t = explode("=",$d);
+			//format style string replace for %s and whatever else we decide, this where we modifiy it.
+			$data[$t[0]] = $t[1];
+			if ( stristr( $data[$t[0]], "%s" ) != false )
+				$data[$t[0]] = str_replace("%s",$_SESSION['dint'],$data[$t[0]]);
+			if ( stristr( $data[$t[0]], "%m" ) != false )
+				$data[$t[0]] = str_replace("%m",unread_messages(),$data[$t[0]]);
+			if ( stristr( $data[$t[0]], "%w1" ) != false )
+				$data[$t[0]] = str_replace("%w1",get_weather(),$data[$t[0]]);
+			if ( stristr( $data[$t[0]], "%w2" ) != false )
+				$data[$t[0]] = str_replace("%w2",get_weather_icon(),$data[$t[0]]);
+	
+			if ( stristr( $data[$t[0]], "%c" ) != false )
+			{
+				$file="home/Applications/countdown/include.js";
+				$fp=fopen($file,"r");
+				$javascript = fread($fp,filesize($file));
+				$data[$t[0]]=str_replace("%c",$javascript,$data[$t[0]]);
+			}
+			$temp = getstatus( $_SESSION['dint'] );
+			if ( strlen($temp) > 0 )  $temp = $temp."<br>Mood: ".getmood( $_SESSION['dint'] ); else $temp = "no status";
+			$data[$t[0]]=str_replace("%q",$temp,$data[$t[0]]);
+		}
+	}
+	return $data;
+}
+/*
+function reference:
+	returns security model for app, or returns false if the app is not installed.
+	
+	string get_section( PATH, APPLICATION )
+
+		PATH:
+			Path to the application.
+			
+		APPLICATION:
+			The name of the application setting the section.
+*/
+function is_app_installed( $app )
+{
+	$sql =  'select security from "Apps" '.
+	 				"where dint='".$_SESSION['dint']."' and app='".$app."'";
+	$result = pg_exec($_SESSION['connection'], $sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		return $row['security'];	
+	}
+	
+	return false;	
+}
+/* 
+function reference:
+	returns whether or not the users is a valid user.
+	
+	bool isuser( )
+
+*/
+function isuser( $user )
+{
+	$sql = 'SELECT count(user) FROM "Users" '."WHERE username='".$user."'";
+	$result = pg_exec($_SESSION['connection'], $sql);
+	$row = pg_fetch_array($result);
+	if ( $row['count'] > 0 )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+/*
+function reference:
+	returns whether or not the current user is the dint user.
+	
+	bool isdint( )
+
+*/
+function isdint( )
+{
+	if ( isset($_SESSION['user']) && isset($_SESSION['dint']) )
+	{
+		if ( strlen ($_SESSION['user']) > 0 )
+		{
+			if ( $_SESSION['user'] == $_SESSION['dint'] )
+			{
+				return true;
+			}
+		}	
+	}
+	return false;
+}
+
+/*
+function reference:
+	returns whether or not the current user is a friend.
+	
+	bool isfriend( )
+
+*/
+function isfriend()
+{
+	$sql = 	'select Count("Friends") as count from "Friends" '.
+					"where username='".$_SESSION['user']."' and dint='".$_SESSION['dint']."'";
+	$result = pg_exec($_SESSION['connection'], $sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		if ( $row['count'] > 0 )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+/*
+function reference:
+	returns whether or not the current user is a friend of a specific.
+	
+	bool isfriendnews( )
+
+*/
+function isfriendnews($user)
+{
+	$sql = 	'select Count("Friends") as count from "Friends" '.
+					"where username='".$_SESSION['user']."' and dint='".$user."'";
+	$result = pg_exec($_SESSION['connection'], $sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		if ( $row['count'] > 0 )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+/*
+function reference:
+	returns if the security model lets the item with <mode> set display.
+	
+	bool checksecure( MODE )
+	
+		MODE:
+			public, friends, private
+*/
+function checksecure( $mode ) 
+{
+	$show = false;
+	if ( isdint() ) {
+		$show=true;
+	}else{
+		if ( $mode == 'friends' ) {
+			if ( isfriend() )
+			{
+				$show=true;
+			}
+		}
+		if ( $mode == 'public' )
+		{
+			$show=true;
+		}
+	}
+	return $show;
+}
+/*
+function reference:
+	returns status message of a user.
+	
+	string getstatus( USER )
+	
+		USER:
+			A valid user in the with dint database.
+*/
+function getstatus($username) 
+{
+	$sql = 'SELECT status FROM "Users" WHERE'." username='".$username."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	$row = pg_fetch_array($result);
+	return $row['status'];
+}
+/*
+function reference:
+	returns status message of a user.
+	
+	string getmood( USER )
+	
+		USER:
+			A valid user in the with dint database.
+*/
+function getmood($username) 
+{
+	$sql = 'SELECT mood FROM "Users" WHERE'." username='".$username."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		if ( strlen( $row['mood'] ) > 0 ) {
+			return $row['mood'];
+		} else {
+			return "";
+		}
+	} else {
+		return "";
+	}
+}
+/*
+function reference:
+	returns the mood icon set of a user.
+	
+	string geticonset( USER )
+	
+		USER:
+			A valid user in the with dint database.
+*/
+function geticonset($username) 
+{
+	$sql = 'SELECT moodiconset FROM "Users" WHERE'." username='".$username."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	$row = pg_fetch_array($result);
+	return $row['moodiconset'];
+}
+/*
+function reference:
+	returns a PG time stamp in a pretty format.
+	
+	string pretty_timestamp( TIMESTAMP , SPLIT=false )
+	
+		TIMESTAMP:
+			A timestamp returned from Postgres. An example of such a timestamp is this: 2009-04-12 03:32:58.150303-04
+			
+		SPLIT:
+			(optional) tells the output to split the date and time to two separate lines.
+*/
+function pretty_timestamp( $date, $split=false )
+{
+	$return = "";
+	$time="";
+	if ( $split )
+	{
+		$split="<br>";
+	}
+	else
+	{
+		$split="";
+	}
+	$now = date("Y m d H i");
+	$yr[0]=substr($date,0,4);
+	$yr[1]=substr($now,0,4);
+	$mon[0]=substr($date,5,2);
+	$mon[1]=substr($now,5,2);
+	$day[0]=substr($date,8,2);
+	$day[1]=substr($now,8,2);
+	$hr[0]=substr($date,11,2);
+	$hr[1]=substr($now,11,2);
+	$min[0]=substr($date,14,2);
+	$min[1]=substr($now,14,2);
+	if ( $hr[0] > 12 )
+	{
+		$time=($hr[0]-12).":".$min[0]." PM";
+	}
+	else
+	{
+		$time=($hr[0]-0).":".$min[0]." AM";
+	}
+	if (	mktime($hr[0],$min[0],"0",$mon[0],$day[0],$yr[0]) > 
+				mktime(0,0,0,$mon[1],$day[1],$yr[1]) )
+	{
+		$return = "Today".$split." at ".$time;
+	}
+	elseif (	mktime($hr[0],$min[0],"0",$mon[0],$day[0],$yr[0]) > 
+						mktime(0,0,0,$mon[1],$day[1]-1,$yr[1]) )
+	{
+		$return = "Yesterday".$split." at ".$time;
+	}
+	else
+	{
+		$return = $mon[0]."/".$day[0]."/".$yr[0].$split." at ".$time;
+	}
+	return $return;
+}
+/*
+function reference:
+	Sends a message to an user.
+	
+	void sendmessage( TITLE, BODY, FROM, USERNAME )
+	
+		TITLE:
+			The title of the system message.
+
+		BODY:
+			The content of the system message.
+			
+		FROM:
+			The user the message is coming from.
+
+		USER:
+			The user the message is being sent to.
+*/
+function sendmessage( $title, $body, $from, $username )
+{
+	$sql =  'INSERT INTO "Comments" (title,username,dint,comment,app) '.
+					"VALUES ('".$title."','".$from."','".$username."','".$body."','messages')";
+	pg_exec($_SESSION['connection'],$sql);
+	$msg = $from." has sent you a message on withdint.\n\n".
+	$title."\n".
+	"\"".$body."\"".
+	"\n\n You can check it at http://".$username.".withdtint.com/";
+}
+/*
+function reference:
+	Outputs the status HTML of a user for use in a frameset.
+	
+	void outputstatus( USER, WIDTH )
+	
+		USER:
+			What user's status to output.
+
+		WIDTH:
+			The width of the status display.
+					
+*/
+function outputstatus( $username, $width, $height = "", $mini=false )
+{
+	if ( count( explode( '%', $width ) ) < 2 ) $width.="px";
+	if (strlen($height) > 0) $height = "height:".$height.";";
+	$mood=getmood($username);
+	if (is_IE()) $inline="inline";
+	else $inline="inline-table";
+	$html = '<table style="width:'.$width.';display:'.$inline.';vertical-align:middle;"'.$height.'>';
+	if (!$mini)
+	{
+		$html .= '<tr><td style="width:75px;'.$height.'overflow:hidden;">';
+	}
+	else
+	{
+		$html .= '<tr><td style="width:16px;'.$height.'overflow:hidden;">';
+	}
+	$html .= '<div style="'.$height.'">';
+	if (file_exists($username.'/photo/default.png')) {
+		$html .= '<img src="http://'.$username.'.withdint.com/'.$username.'/photo/default.png" class="icon" style="'.$height.'">';
+	} else { 
+		$html .='<img src="http://www.withdint.com/home/images/portrait.png" class="icon" style="'.$height.'">';
+	}
+	$html .= '</div></td><td style="width:100%;color:white;text-align:left;padding-left:10px;padding-right:10px;overflow:hidden">';
+	$html .= '<div style="'.$height.'">';
+	$html .= str_replace("_"," ",$username);
+	if ( strlen($mood) > 0 )
+	{
+		$html .= ' is '.$mood.' <img src="http://'.$username.'.withdint.com/home/SysApps/status/'.geticonset($username).'/'.getmood($username).'.png" class="icon" style="width:16px;">';
+		if (!$mini)
+		{
+			$html .= '<img src="/home/images/hr.png" style="width:100%;height:1px;">'.getstatus($username);
+		}
+	}
+	$html .= '</div></td></tr></table>';
+	return $html;
+}
+
+/*
+function reference:
+	Outputs the status HTML of a user for use on the news site.
+	
+	void outputnewsstatus( USER, WIDTH )
+	
+		USER:
+			What user's status to output.
+
+		WIDTH:
+			The width of the status display.
+					
+*/
+function outputnewsstatus( $username )
+{
+	$mood=getmood($username);
+	$html = '';
+	if (file_exists('/var/www/withdint.seijinohki.net/'.$username.'/photo/default.png')) {
+		$html .= '<img src="http://'.$username.'.withdint.com/'.$username.'/photo/default.png" style="float:right;padding-left:10px;padding-right:10px;">';
+	} else { 
+		$html .='<img src="http://www.withdint.com/home/images/portrait.png" class="icon" style="float:right;padding-left:10px;padding-right:10px;">';
+	}
+	$html .= 'Welcome,<br> <a href="http://'.$username.'.withdint.com/">'.str_replace("_"," ",$username)."</a><br>";
+	if ( $mood != "" )
+	{
+		$html .= '<i>"'.$mood.'"</i><br>';
+		$html .= '<img src="http://'.$username.'.withdint.com/home/SysApps/status/'.geticonset($username).'/'.getmood($username).'.png" class="icon" style="width:32px;">';
+	}
+	return $html;
+}
+/*
+function reference:
+	Returns true or false based on if an application is installed or not.
+	
+	bool isappinstalled( APPNAME )
+	
+		APPNAME:
+			The file name without .php of the application.
+
+*/
+function isappinstalled( $app ) {
+	$retval=false;
+	$sql = 'SELECT COUNT(app) AS count FROM "Apps" '.
+					"WHERE dint='".$_SESSION['dint']."' AND app='".$app."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		if ( $row['count'] > 0 )
+		{
+			$retval=true;
+		}
+	}
+	return $retval;
+}
+/*
+function reference:
+	Returns true or false based on if an application is installed or not.
+	
+	bool isappinstalled( APPNAME )
+	
+		APPNAME:
+			The file name without .php of the application.
+
+*/
+function hasappinstalled( $app, $user ) {
+	$retval=false;
+	$sql = 'SELECT COUNT(app) AS count FROM "Apps" '.
+					"WHERE dint='".$user."' AND app='".$app."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		if ( $row['count'] > 0 )
+		{
+			$retval=true;
+		}
+	}
+	return $retval;
+}
+/*
+function reference:
+	Writes to the log table of the database TEXT passed in for the current dint.
+	
+	void logme( TEXT )
+	
+		TEXT:
+			What needs to be logged.
+
+*/
+function logme( $text ) {
+	$sql = 'INSERT INTO "Log" (dint, action) '.
+					"VALUES ('".$_SESSION['dint']."','".$text."')";
+	pg_exec($_SESSION['connection'],$sql);
+}
+/*
+function reference:
+	Writes to the log table of the database TEXT passed in for the current dint.
+	
+	void logme( TEXT )
+	
+		TEXT:
+			What needs to be logged.
+
+*/
+function logmenews( $text ) {
+	$sql = 'INSERT INTO "Log" (dint, action) '.
+					"VALUES ('".$_SESSION['user']."','".$text."')";
+	pg_exec($_SESSION['connection'],$sql);
+}
+/*
+*/
+function validfile( $type )
+{
+	if ( $type == "application/octet-stream" ) return false;
+	return true;
+}
+/*
+*/
+function get_files( $data )
+{
+	$rval=array();
+	$d=explode("<location>",$data);
+	for ( $a = 1 ; $a < count($d) ; $a++ )
+	{
+		$e = explode( "</location>", $d[$a] );
+		$f = explode( "/", $e[0] );
+		$file = $f[count($f)-3].'/music/'.urldecode($f[count($f)-1]);
+		$rval[urldecode($f[count($f)-1])]=$file;
+	}
+	return $rval;
+}
+/*
+*/
+function uTimestamp( $str )
+{
+	$str=str_replace("-",":",$str);
+	$str=str_replace(" ",":",$str);
+	$a=explode( ":", $str);
+	//YMDHMS
+	//012345
+	return mktime($a[3],$a[4],$a[5],$a[1],$a[2],$a[0]);
+}
+/*
+*/
+function darken( $str, $perc = "50" )
+{
+	$hex[0]=$str[0].$str[1];
+	$hex[1]=$str[2].$str[3];
+	$hex[2]=$str[4].$str[5];
+	$perc=$perc/100;
+	$hex[0] = dechex( hexdec($hex[0]) * $perc );
+	$hex[1] = dechex( hexdec($hex[1]) * $perc );
+	$hex[2] = dechex( hexdec($hex[2]) * $perc );
+	return $hex[0].$hex[1].$hex[2];
+}
+/*
+function reference:
+	Sorts an array alphabetically.
+	
+	ARRAY sortalpha( ARRAY )
+	
+		ARRAY:
+			An array of strings that you want sorted.
+
+*/
+function sortalpha( $iarray )
+{
+	$oarray=array();
+	
+	foreach ($iarray as $n=>$str)
+	{
+		$temp=$str;
+		for ( $a = 0; $a < $n; $a++ )
+		{
+			if ( strcmp( strtolower($temp), strtolower($oarray[$a]) ) < 0 )
+			{
+				$temp2=$temp;
+				$temp=$oarray[$a];
+				$oarray[$a]=$temp2;
+			}
+		}
+		$oarray[]=$temp;
+	}
+	return $oarray;
+}
+/*
+function reference:
+	Sorts the key of an array alphabetically.
+	
+	ARRAY sortkeyalpha( ARRAY )
+	
+		ARRAY:
+			An array of strings that you want sorted.
+
+*/
+function sortkeyalpha( $iarray )
+{
+	$keys = array();
+	foreach ( $iarray as $key => $value )
+	{
+		$temp = $key;
+		for ( $a = 0; $a < count($keys); $a++ )
+		{
+			if ( strcmp( strtolower($temp), strtolower($keys[$a]) ) < 0 )
+			{
+				$temp2 = $temp;
+				$temp = $keys[$a];
+				$keys[$a] = $temp2;
+			}
+		}
+		$keys[] = $temp;
+	}
+	
+	$oarray=array();
+	foreach ($keys as $key)
+	{
+		$oarray[$key] = $iarray[$key];
+	}
+	return $oarray;
+}
+/*
+function reference:
+	Sorts the key of an array randomly.
+	
+	ARRAY sortkeyrandom( ARRAY )
+	
+		ARRAY:
+			An array of strings that you want sorted.
+
+*/
+function sortkeyrandom( $iarray )
+{
+	$keys = array();
+	foreach ( $iarray as $key => $value )
+	{
+		$keys[]=$key;
+	}
+
+	for ( $j = 0; $j < 4; $j++ )
+	{
+		for ( $i = 0; $i < count($keys); $i++ )
+		{
+			$temp = $keys[$i];
+			$num = rand(0,count($keys)-1);
+			$keys[$i] = $keys[$num];
+			$keys[$num] = $temp;
+		}
+	}
+	
+	$oarray=array();
+	foreach ($keys as $key)
+	{
+		$oarray[$key] = $iarray[$key];
+	}
+	return $oarray;
+}
+/*
+function reference:
+	Returns the string "true" or "false" for database usage.
+	
+	STRING checkbox( STRING )
+	
+		STRING:
+			The string ouput of a checkbox variable from $_POST or $_GET.
+*/
+function checkbox( $str )
+{
+	$rtn = "false";
+	if ( $str == "on" )
+	{
+		$rtn="true";
+	}
+	return $rtn;
+}
+/*
+function reference:
+	Messages a group, usually this is used for notification purposes.
+
+	VOID messagegroup( GROUP, TITLE, MESSAGE )
+	
+		GROUP:
+			The name of the group to send the message to.
+		
+		TITLE:
+			The title of the message to be sent.
+			
+		MESSAGE:
+			The message to be sent.		
+*/
+function messagegroup( $group, $title, $message )
+{
+	$users=array();
+	$sql = 'SELECT "owner" FROM "Groups" WHERE "name" = \''.$group.'\'';
+	$res = pg_exec($_SESSION['connection'], $sql );
+	if ( $row = pg_fetch_array($res) )
+	{
+		$users[]=$row['owner'];
+	}
+	$sql = 'SELECT "username" FROM "GroupMembers" WHERE "groupname" = \''.$group.'\'';
+	$res = pg_exec($_SESSION['connection'], $sql );
+	while ( $row = pg_fetch_array($res) )
+	{
+		$users[]=$row['username'];
+	}
+	foreach ( $users as $user )
+	{
+		sendmessage( $title, $message, "system", $user );
+		notify( $user, "groupmessages", $message );
+	}
+}
+/*
+function reference:
+	Returns bool depending on if the group is owned by the current user or not.
+	
+	BOOL ownsgroup( GROUP )
+	
+		GROUP:
+			The name of the group to check.
+*/
+function ownsgroup( $group )
+{
+	$sql = 'SELECT COUNT("owner") AS count FROM "Groups" '.
+					"WHERE owner = '".$_SESSION['user']."' and name = '".$group."'";
+	$result = pg_exec( $_SESSION['connection'], $sql );
+	$row = pg_fetch_array( $result );
+	if ( $row['count'] > 0 )
+	{
+		return true;
+	}
+	return false;
+}
+/*
+function reference:
+	Returns bool depending on if email is a valid email address.
+	
+	BOOL ownsgroup( EMAILADDRESS )
+	
+		EMAILADDRESS:
+			A string to be checked as a valid e-mail address.
+*/
+
+function checkemailaddress($email) {
+	if (!ereg("^[^@]{1,64}@[^@]{1,255}$", $email)) 
+	{
+		return false;
+  	}
+	$email_array = explode("@", $email);
+	$local_array = explode(".", $email_array[0]);
+	for ($i = 0; $i < sizeof($local_array); $i++) 
+	{
+    	if(!ereg("^(([A-Za-z0-9!#$%&'*+/=?^_`{|}~-][A-Za-z0-9!#$%&'*+/=?^_`{|}~\.-]{0,63})|(\"[^(\\|\")]{0,62}\"))$",$local_array[$i])) 
+    	{
+			return false;
+    	}
+	}
+	if (!ereg("^\[?[0-9\.]+\]?$", $email_array[1])) 
+	{
+    	$domain_array = explode(".", $email_array[1]);
+    	if (sizeof($domain_array) < 2) 
+    	{
+        	return false;
+    	}
+		for ($i = 0; $i < sizeof($domain_array); $i++) 
+		{
+			if (!ereg("^(([A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9])|([A-Za-z0-9]+))$",$domain_array[$i])) 
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+/*
+function reference:
+	reduces strings to just letters and numbers.
+	
+	STRING alphanumeric( STRING )
+	
+		STRING:
+			Any valid string.
+*/
+function alphanumeric( $str )
+{
+	$str = preg_replace("[[^A-Za-z0-9]]","",$str);	
+	return $str;
+}
+/*
+function reference:
+	takes out any html.
+	
+	STRING alphanumeric( STRING )
+	
+		STRING:
+			Any valid string.
+*/
+function striphtml( $str )
+{
+	$str = preg_replace("[<.*?>]","",$str);
+	return $str;
+}
+/*
+function reference:
+	gets all groups of a specific user.
+	
+	ARRAY{STRING} getgroups( USER )
+	
+*/
+function getgroups( $user )
+{
+	$output = array();
+	$sql = 'SELECT "name" FROM "Groups" WHERE "owner" = \''.$user.'\'';
+	$res = pg_exec( $_SESSION['connection'], $sql );
+	while ( $row = pg_fetch_array( $res ) )
+	{
+		$output[] = $row['name'];
+	}
+
+	$sql = 'SELECT "groupname" FROM "GroupMembers" WHERE "username" = \''.$user.'\'';
+	$res = pg_exec( $_SESSION['connection'], $sql );
+	while ( $row = pg_fetch_array( $res ) )
+	{
+		$output[] = $row['groupname'];
+	}
+	return $output;
+}
+function getgroupid( $group )
+{
+	$sql = 'SELECT "ID" FROM "Groups" WHERE "name" = \''.$group.'\'';
+	$res = pg_exec( $_SESSION['connection'], $sql );
+	if ( $row = pg_fetch_array( $res ) )
+	{
+		return intval($row['ID']);
+	}
+	else
+	{
+		return 0;
+	}
+}
+function getgroupname( $id )
+{
+	if (is_numeric($id))
+	{
+		$sql = 'SELECT "name" FROM "Groups" WHERE "ID" = '.$id.'';
+		$res = pg_exec( $_SESSION['connection'], $sql );
+		if ( $row = pg_fetch_array( $res ) )
+		{
+			return $row['name'];
+		}
+		else
+		{
+			return "INVALID GROUP";
+		}
+	}
+	else
+	{
+		return "INVALID GROUP";
+	}
+}
+/*
+function reference:
+	Shows when a user was last online.
+	
+	STRING lastonline( USER )
+
+		USER:
+			Any valid With Dint user.
+*/
+function lastonline( $user )
+{
+	$sql = 'SELECT "lastseen" FROM "Users" WHERE "username" = \''.$user.'\'';
+	$res = pg_exec($_SESSION['connection'],$sql);
+	$row = pg_fetch_array($res);
+	return $row['lastseen'];
+}
+/*
+function reference:
+	Gets a unique id from the database for the file and generates a metadata entry for that file.
+	
+	HTML getfileid( FILE )
+	
+		FILE:
+			a path to the file to be added / compared in the database
+*/
+function getfileid( $file, $username="" )
+{
+	$id = false;
+	$sql = 'SELECT count("ID") AS c FROM "Files" WHERE "filename" = \''.$file.'\'';
+	$res = pg_exec($_SESSION['connection'],$sql);
+	if ( $row = pg_fetch_array($res) )
+	{
+		if ( intval($row['c']) == 0 )
+		{
+			$sql = 'INSERT INTO "Files" ("filename","username") VALUES (\''.$file.'\',\''.$username.'\')';
+			pg_exec($_SESSION['connection'],$sql);
+		}
+	}
+	
+	$sql = 'SELECT "ID" FROM "Files" WHERE "filename" = \''.$file.'\'';
+	$res = pg_exec($_SESSION['connection'],$sql);
+	if ( $row = pg_fetch_array($res) )
+	{
+		$id = intval($row['ID']);
+	}
+
+	return $id;
+}
+/*
+function reference:
+	Gets a unique id from the database for the file and generates a metadata entry for that file.
+	
+	HTML getfileid( FILE )
+	
+		FILE:
+			a path to the file to be added / compared in the database
+*/
+function getfileuser( $file )
+{
+	$sql = 'SELECT "username" FROM "Files" WHERE "filename" = \''.$file.'\'';
+	$res = pg_exec( $_SESSION['connection'],$sql );
+	if ($row = pg_fetch_array($res))
+	{
+		return $row['username'];
+	}
+	else
+	{
+		return false;
+	}
+}
+?>

@@ -1,0 +1,171 @@
+#waveForm {
+	width:100%;
+	height:300px;
+}
+#controls {
+	position:relative;
+	top:-130px;
+	left:10px;
+}
+#mp3Title {
+	font-family:"Arial",sans-serif;
+	font-size:30px;
+	font-weight:bold;
+	color:#660088;
+	text-shadow:2px 2px 5px #FFF;
+}
+#mp3Comment{
+	font-family:"Arial",sans-serif;
+	font-size:20px;
+	padding-top:20px;
+	padding-bottom:40px;
+	color:#000088;
+}
+#mp3Description{
+	text-align:justify;
+	font-family:"Book Antiqua",serif;
+	padding-right:100px;
+}
+table.master .lefttile {
+	width:10px;
+}
+table.master .rightgutter {
+	width:10px;
+}
+table.master .thebody {
+	width:100%;
+	min-width:500px;
+}
+table.master .innerbody {
+	min-width:500px;
+}
+#playButton, #pauseButton, #seekingButton {
+	position:absolute;
+	left:170px;
+	top:68px;
+}
+
+#playButton, #pauseButton {
+	cursor:pointer;
+}
+
+#waveFormContainer {
+	position: relative;
+}
+
+#seekBar {
+	position:absolute;
+	background:white;
+	border:1px solid rgba(128,128,128,.5);
+	width:1px;
+	height:150px;
+	left:0px;
+	top:0px;
+}
+img.markers {
+	position:absolute;
+	left:0px;
+	top:130px;
+	display:inline;
+	cursor:pointer;
+}
+
+
+span.trackName {
+	color: #008;
+}
+span.artist {
+	color: #088;
+
+}
+span.album {
+	color: #080;
+
+}
+span.comment {
+	color:#888;
+}
+
+table.tracks {
+	width:100%;
+}
+
+table.tracks tr {
+	border-bottom: 2px solid #CCE;
+}
+
+table.tracks th {
+	font-family: "Arial",sans-serif;
+	font-weight:bold;
+}
+
+table.tracks th.trackNumber {
+	width:50px;
+}
+
+table.tracks th.trackTime {
+	width:100px;
+}
+
+table.tracks th.trackInfo {
+	width:250px;
+}
+table.tracks th.trackComment{
+	width:100%;
+}
+
+table.tracks td.trackNumber {
+	font-size:40px;
+	font-weight:bold;
+	font-family:sans-serif;
+	text-align:right;
+	padding-right:10px;
+	vertical-align:middle;
+}
+table.tracks td.trackTime {
+	vertical-align: middle;
+}
+table.tracks td.trackComment{
+	padding:5px;
+}
+span.trackName.list {
+	font-family:Arial,sans-serif;
+	font-size:12px;
+	font-weight:bold;
+}
+span.artist.list {
+	font-family:Arial,sans-serif;
+	font-size:10px;	
+	font-style: italic;
+	line-height:12px;
+
+}
+span.album.list {
+	font-family:Arial,sans-serif;
+	font-size:10px;
+	line-height:12px;
+
+}
+span.comment.list {
+	font-size:12px;
+	text-align: justify;
+	width:100%;
+	display:block;
+	position:relative;
+	left:-5px;
+}
+span.markerLink {
+	cursor:pointer;
+	border:1px solid black;
+	border-radius:100px;
+	background:#EEE;
+}
+table.tracks tr.selected{
+	border-left:10px solid green;
+	border-right:1px solid green;
+	background-color:#CFC;
+}
+
+table.infoPanel {
+	width:200px;
+}

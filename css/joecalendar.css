@@ -1,0 +1,156 @@
+td.calinp
+{
+	font-weight:bold;
+	border:0px;
+	color:black;
+	background:white;
+	cursor:pointer;
+	width:70px;
+}
+input.calinp
+{
+	color:black;
+	background:white;
+	cursor:pointer;
+	width:70px;
+}
+img.calicon
+{
+	cursor:pointer;
+}
+div.caldiv
+{
+	width:200px;
+	height:200px;
+	position:absolute;
+	display:none;
+	padding:0px;
+	margin:0px;
+}
+table.calendar
+{
+	width:200px;
+	height:200px;
+	padding:0px;
+	margin:0px;
+	border-collapse:collapse;
+	table-layout:fixed;
+}
+table.calendar td
+{
+	padding:0px;
+	margin:0px;
+}
+table.calendar td.cala
+{
+	height:7px;
+	width:7px;
+	background:url('../img/calendar/1.png') no-repeat;
+}
+table.calendar td.calb
+{
+	height:7px;
+	width:100%;
+	background:url('../img/calendar/2.png') repeat-x;
+}
+table.calendar td.calc
+{
+	height:7px;
+	width:7px;
+	background:url('../img/calendar/3.png') no-repeat;
+}
+table.calendar td.cald
+{
+	height:100%;
+	width:7px;
+	background:url('../img/calendar/4.png') repeat-y;
+}
+table.calendar td.cale
+{
+	height:100%;
+	width:100%;
+	background:url('../img/calendar/5.png') repeat;
+	vertical-align:top;
+	text-align:center;
+}
+table.calendar td.calf
+{
+	height:100%;
+	width:7px;
+	background:url('../img/calendar/6.png') repeat-y;
+}
+table.calendar td.calg
+{
+	height:7px;
+	width:7px;
+	background:url('../img/calendar/7.png') no-repeat;
+}
+table.calendar td.calh
+{
+	height:7px;
+	width:100%;
+	background:url('../img/calendar/8.png') repeat-x;
+}
+table.calendar td.cali
+{
+	height:7px;
+	width:7px;
+	background:url('../img/calendar/9.png') no-repeat;
+}
+table.calendar img.nav
+{
+	cursor:pointer;
+}
+span.calmonth
+{
+	font-weight:bold;
+	font-family:"Lucida Console",monospace;
+	color:#0067c6;
+	font-size:12px;
+}
+/*the calander squares*/
+table.calbody
+{
+	width:189px;
+	height:162px;
+	table-layout:fixed;
+	border-collapse:collapse;
+}
+table.calbody td
+{
+	width:27px;
+	height:27px;
+	border:0px;
+	margin:0px;
+	padding:0px;
+	vertical-align:top;
+	text-align:left;
+	font-family:"Lucida Console",monospace;
+	font-weight:bold;
+	font-size:10px;
+}
+table.calbody td.blank
+{
+	background:#BBB;
+}
+table.calbody td.odd
+{
+	background:#EEE;
+	cursor:pointer;
+}
+table.calbody td.even
+{
+	background:#DDD;
+	cursor:pointer;
+}
+table.calbody td.today
+{
+	background:#FC5;
+	cursor:pointer;
+}
+table.calbody td.day
+{
+	background:#0067c6;
+	color:white;
+	height:12px;
+}

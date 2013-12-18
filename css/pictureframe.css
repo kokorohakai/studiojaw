@@ -1,0 +1,84 @@
+table.pictureframe
+{
+	table-layout:fixed;
+	border-collapse:collapse;
+	padding:0px;
+	margin:0px;
+	height:auto;
+	width:auto;
+}
+table.pictureframe td
+{
+	
+}
+table.pictureframe td.cella
+{
+	background:url('../img/pictureframe/a.png') no-repeat;
+	width:15px;
+	height:15px;
+	padding:0px;
+	margin:0px;
+}
+table.pictureframe td.cellb
+{
+	background:url('../img/pictureframe/b.png') repeat-x;
+	width:auto;
+	height:15px;
+	padding:0px;
+	margin:0px;
+}
+table.pictureframe td.cellc
+{
+	background:url('../img/pictureframe/c.png') no-repeat;
+	width:15px;
+	height:15px;
+	padding:0px;
+	margin:0px;
+}
+table.pictureframe td.celld
+{
+	background:url('../img/pictureframe/d.png') repeat-y;
+	width:15px;
+	height:auto;
+	padding:0px;
+	margin:0px;
+}
+table.pictureframe td.celle
+{
+	width:auto;
+	height:auto;
+	padding:0px 3px 3px 0px;
+	margin:0px;
+}
+table.pictureframe td.cellf
+{
+	background:url('../img/pictureframe/f.png') repeat-y;
+	width:15px;
+	height:auto;
+	padding:0px;
+	margin:0px;
+}
+table.pictureframe td.cellg
+{
+	background:url('../img/pictureframe/g.png') no-repeat;	
+	width:15px;
+	height:15px;
+	padding:0px;
+	margin:0px;
+}
+table.pictureframe td.cellh
+{
+	background:url('../img/pictureframe/h.png') repeat-x;
+	width:auto;
+	height:15px;
+	padding:0px;
+	margin:0px;
+}
+table.pictureframe td.celli
+{
+	background:url('../img/pictureframe/i.png') no-repeat;
+	width:15px;
+	height:15px;
+	padding:0px;
+	margin:0px;
+}

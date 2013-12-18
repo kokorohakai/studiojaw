@@ -1,0 +1,163 @@
+div, body, table, p, td, img
+{
+	table-layout: fixed;
+	border-collapse: collapse;
+	padding: 0px;
+	margin: 0px;
+	border: 0px;
+	font-family: "Book Antiqua", "Times New Roman", "Times", serif;
+	font-size: 12pt;
+	color: black;
+	white-space:normal;
+	text-align:left;
+	vertical-align:top;
+}
+body,div
+{
+}
+
+/*general site stuff.*/
+pre
+{
+	font-size:10px;
+	font-family:"Lucida Console",monospace;
+	white-space:pre-wrap;
+}
+h1
+{
+	font-family: "Franklin Gothic Medium","Helvetica","Arial",sans-serif;
+	font-size:30px;
+	color: #6600AA;
+	border-bottom: 4px solid black;
+	display: inline;
+	padding-bottom: 7px;
+	line-height: 40px;
+}
+h2
+{
+	font-family: "Book Antiqua", "Times New Roman", "Times", serif;
+	font-size:18pt;
+	color: #6600AA;	
+}
+a, a:visited, a:active
+{
+	color: #6600AA;	
+	font-weight:bold;
+	text-decoration:none;
+}
+a:hover
+{
+	color: #66AA00;
+}
+
+/*the master table of the site*/
+table.master
+{
+	width: 100%;
+	height: 100%;
+	position:absolute;
+	left:0px;
+	top:0px;
+	z-index:100;
+}
+table.master .masterrow
+{
+	height: 100%;
+}
+table.master .lefttile
+{
+	height: 100%;
+	width: 50%;
+	background: url('img/lefttile.png') repeat;
+}
+table.master .nav
+{
+	height:100%;
+	width:199px;
+	background: url('img/centertile.png') repeat;
+	text-align:right;
+}
+div.nav
+{
+	width:199px;
+	height:100%;
+	position:fixed;
+	text-align:right;
+}
+table.master .guttertile
+{
+	height:100%;
+	width:54px;
+	background: url('img/guttertile.png') repeat-y;
+}
+table.master .thebody
+{
+	height:100%;
+	width:618px;
+	background:white;
+}
+table.master .innerbody
+{
+	padding:20px;
+}
+table.master .edge
+{
+	height:100%;
+	width:4px;
+	background:url('img/edge.png') repeat-y;
+}
+table.master .rightgutter
+{
+	height:100%;
+	width:50%;
+	background:url('img/background.png') repeat;
+}
+/*icons*/
+table.icontable
+{
+	width:58px;
+	margin-left:135px;
+	margin-top:5px;
+	position:absolute;
+	z-index:4;
+	overflow:show;
+}
+td.icon
+{
+	height:62px;
+	width:58px;
+}
+img.icon
+{
+	position:relative;	
+	z-index: 200;
+	overflow:show;
+}
+div.label
+{
+	position:absolute;
+	z-index: 190;
+	white-space:nowrap;
+	padding:5px 0px 5px 0px;
+	margin-top:-45px;
+	margin-left:30px;
+	color:white;
+	background:#000000;
+	height:20px;
+	font-family:"Franklin Gothic Medium","Helvetica","Arial",sans-serif;
+	overflow:hidden;
+	line-height:17px;
+	font-size:17px;
+	width:0px;
+}
+.link
+{
+	color: #6600AA;	
+	font-weight:bold;
+	text-decoration:none;
+	cursor:pointer;
+}
+.link:hover
+{
+	color: #66AA00;
+}

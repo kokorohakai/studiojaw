@@ -1,0 +1,27 @@
+a:link{
+	color:#0000FF;
+	}
+TABLE { 
+ 	table-layout:fixed;
+	border-collapse:collapse;
+}
+td {
+	border:0px;
+	padding:0px;
+	margin:0px;
+	vertical-align:bottom;
+	text-align:left;
+	font-family:'arial';
+	color:#5500AA;
+	font-size:12pt;
+}
+img {
+	border:0px;
+	vertical-align:bottom
+}
+b {
+	color:black;
+}
+hr {
+	color:red;
+}

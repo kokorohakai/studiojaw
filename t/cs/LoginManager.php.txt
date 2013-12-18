@@ -1,0 +1,321 @@
+<?php
+function cleanup()
+{
+	//get rid of old unconfirmed users.
+	$sql = 'DELETE FROM "Users" WHERE "datecreated" < current_date-30 and "confirmkey" <> \'\' and "confirmed" = false;';
+	pg_exec($_SESSION['connection'],$sql);
+	
+	//delete old files.
+	$stuff = `ls -A1 /var/www/withdint.seijinohki.net`;
+	$data = preg_split("[\n]",$stuff);
+	$sql = 'SELECT "username" FROM "Users"';
+	$res = pg_exec($_SESSION['connection'],$sql);
+	$users = pg_fetch_all_columns($res,0);
+	foreach ($data as $a=>$b)
+	{
+		if ( !is_dir('/var/www/withdint.seijinohki.net/'.$b) || $b == "home" || $b == "" || in_array($b,$users) || $b=="." || $b == ".." )
+		{
+			unset($data[$a]);
+		}
+		else
+		{
+		echo `rm -rf "/var/www/withdint.seijinohki.net/$b"`;
+		}
+	}
+}
+
+function user_exists( $username )
+{
+	$userexists=false;
+	$result = pg_exec($_SESSION['connection'],'SELECT COUNT("username") as count FROM "Users" WHERE username='."'".$username."'");
+	$row = pg_fetch_array($result);
+	if ( $row['count'] > 0 )
+	{
+		$userexists=true;
+	}
+	return $userexists;	
+}
+
+function setemail( $user, $email )
+{
+	if ( isactive( $user ) )
+	{
+		$sql = 'update "Users"'." set email='".$email."' where username='".$user."'";
+		pg_exec($_SESSION['connection'],$sql);
+	}
+
+}
+function email_user( $email )
+{
+	$userexists=false;
+	$result = pg_exec($_SESSION['connection'],'SELECT COUNT("email") as count FROM "Users" WHERE email='."'".$email."'");
+	$row = pg_fetch_array($result);
+	if ( $row['count'] > 0 )
+	{
+		$userexists=true;
+	}
+	return $userexists;		
+}
+
+function createuser( $username, $email, $password, $type = "dint" )
+{
+	$username=strtolower($username);
+	$username=alphanumeric($username);
+	$key=rand().rand().$username.rand().rand();
+		
+	$sql = 	'INSERT INTO "Users" ("username","email","password","confirmed","confirmkey") '.
+					"VALUES ('".$username."','".$email."','".$password."'::bytea,false,'".$key."')";
+	pg_exec($_SESSION['connection'],$sql);
+	if ($type == "dint")
+	{
+		$content=	"Welcome ".$username.",\n\n".
+						"Thank you for registering with With Dint! We are glad to see you have chosen to join our community!\n\n".
+						"To activate your account click here:\n\n".
+						"http://www.withdint.com/?section=register&activatekey=".$key."\n\n".
+						"CONFIDENTIALITY NOTICE:\n This communication is only for the person named above. Unless otherwise indicated, it contains information that is confidential, privileged or exempt from disclosure under applicable law. If you are not the person named above, or responsible for delivering it to that person, be aware that disclosure, copying, distribution or use of this communication is strictly PROHIBITED. If you have received this communication in error, or are uncertain as to its proper handling, please immediately notify us on our website to let us know.";
+	}
+	elseif ($type == "news")
+	{
+		$content=	"Welcome ".$username.",\n\n".
+						"Thank you for registering with With Dint! We are glad to see you have chosen to join our community!\n\n".
+						"To activate your account click here:\n\n".
+						"http://news.withdint.com/?section=register&activatekey=".$key."\n\n".
+						"CONFIDENTIALITY NOTICE:\n This communication is only for the person named above. Unless otherwise indicated, it contains information that is confidential, privileged or exempt from disclosure under applicable law. If you are not the person named above, or responsible for delivering it to that person, be aware that disclosure, copying, distribution or use of this communication is strictly PROHIBITED. If you have received this communication in error, or are uncertain as to its proper handling, please immediately notify us on our website to let us know.";
+	}
+	sendemail($email,"Activate your With Dint account",$content);
+	cleanup();
+}
+
+function activate( $key )
+{
+	$data=false;
+	
+	$sql =  'SELECT COUNT("confirmkey") from "Users"'.
+					"where confirmkey='".$key."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	$row = pg_fetch_array($result);
+	
+	if ( $row['count'] > 0 )
+	{
+		$sql =  'SELECT confirmed from "Users"'.
+						"where confirmkey='".$key."'";
+		$result = pg_exec($_SESSION['connection'],$sql);
+		$row = pg_fetch_array($result);
+		if ( $row['confirmed'] == "f" )
+		{
+			$sql = 'update "Users" set confirmed=true '.
+						 "where confirmkey='".$key."'";
+			pg_exec($_SESSION['connection'],$sql);
+		}
+		else
+		{
+			$data = "This account has already been activated.<br>(Don't worry, you should still be able to log in.)";
+		}
+	}
+	else
+	{
+		$data = "This account does not exist.";
+	}
+	
+	return $data;
+}
+
+function getemail( $user )
+{
+	$user=str_replace("'","",$user);
+	
+	$email=false;
+
+	$sql =  'SELECT email from "Users"'.
+					"where username='".$user."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		$email=$row['email'];	
+	}
+	
+	return $email;	
+}
+
+function getkey( $user )
+{
+	$user=str_replace("'","",$user);
+	
+	$confirmkey=false;
+
+	$sql =  'SELECT confirmkey from "Users"'.
+					"where username='".$user."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		$confirmkey=$row['confirmkey'];	
+	}
+	
+	return $confirmkey;	
+}
+
+function getpassword( $user )
+{
+	$user=str_replace("'","",$user);
+	
+	$password=false;
+
+	$sql =  'SELECT password from "Users"'.
+					"where username='".$user."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		$password=pg_unescape_bytea($row['password']);	
+	}
+	return $password;	
+}
+
+function setpassword( $user, $password )
+{
+	if ( isactive( $user ) )
+	{
+		$sql = 'update "Users"'." set password='".$password."' where username='".$user."'";
+		pg_exec($_SESSION['connection'],$sql);
+	}
+}
+function isactive( $user )
+{
+	$active=false;
+	$user=str_replace("'","",$user);
+	
+	$sql =  'SELECT confirmed from "Users"'.
+					"where username='".$user."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		if ( $row['confirmed'] == 't')
+		{
+			$active=true;
+		}
+	}
+	return $active;
+}
+function allowcookie($user,$allow)
+{
+	if ($allow)
+	{
+		$sql = 	'UPDATE "Users" set cookie=true '.
+						"where username='".$user."'";
+		pg_exec($_SESSION['connection'],$sql);
+	}
+	else
+	{
+		$sql = 	'UPDATE "Users" set cookie=false '.
+						"where username='".$user."'";
+		pg_exec($_SESSION['connection'],$sql);
+		
+	}
+}
+function cancookie($user)
+{
+	$cookie=false;
+	$user=str_replace("'","",$user);
+	
+	$sql =  'SELECT cookie from "Users"'.
+					"where username='".$user."'";
+	$result = pg_exec($_SESSION['connection'],$sql);
+	if ( $row = pg_fetch_array($result) )
+	{
+		if ( $row['cookie'] == 't')
+		{
+			$cookie=true;
+		}
+	}
+	return $cookie;
+}
+
+function updateip()
+{
+	$ip = $_SERVER['REMOTE_ADDR'];
+	$sql = 'UPDATE "Users" SET "IP" = \''.$ip.'\' WHERE "username"=\''.$_SESSION['user'].'\'';
+	pg_exec($_SESSION['connection'],$sql);
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// the stuff that's ran at the beginning of index.php.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+$loginmessage="<br>Please use the login bar to log in.<br><br>";
+if ( !isset( $_SESSION['user'] ) )
+{
+	$_SESSION['user']="";
+	$_SESSION['loggedin']=false;
+}
+if ( isset ( $_COOKIE['username'] ) && isset ( $_COOKIE['password'] ) && !$_SESSION['loggedin'] )
+{
+	if ( cancookie( $_COOKIE['username'] ) )
+	{
+		$password = getpassword( str_replace(" ","_",$_COOKIE['username'] ) );
+		if ( $password == $_COOKIE['password'] && isactive( str_replace(" ","_",$_COOKIE['username']) ) )
+		{
+			$_SESSION['user']=str_replace(" ","_",$_COOKIE['username']);
+			$_SESSION['loggedin']=true;
+			updateip();
+		}
+	}
+}
+if ( isset ( $_POST['logout'] ) )
+{
+	allowcookie($_SESSION['user'],false);
+	$_SESSION['user'] = "";
+	$_SESSION['loggedin'] = false;
+	$loginmessage = "You have logged out of With Dint.<br><br>Good bye!<br><br>";
+	$_SESSION['msg'][] = $loginmessage;
+	setcookie("username","",0,"/",".withdint.com");
+	setcookie("password","",0,"/",".withdint.com");
+}
+if ( isset ( $_POST['login'] ) )
+{
+	$loginmessage="Could not log in.<br><br>Reason Unknown.<br><br>";
+	$piece="Could not log in.<br><br>";
+	if ( $_POST['key'] == $_SESSION['prevkey'] )
+	{
+		$password = getpassword( strtolower( str_replace(" ","_",$_POST['username']) ) );
+		if (!$password)
+		{
+			$loginmessage = $piece."User does not exist.<br><br>";
+			$_SESSION['msg'][] = $loginmessage;
+		}
+		else
+		{
+			if ( isactive( strtolower( str_replace(" ","_",$_POST['username']) ) ) )
+			{
+				if ( $_POST['password'] != $password )
+				{
+					$loginmessage = $piece."Password incorrect.<br><br>";
+					$_SESSION['msg'][] = $loginmessage;
+				}
+				else
+				{
+					$_SESSION['user']=str_replace(" ","_",strtolower($_POST['username']));
+					$_SESSION['loggedin']=true;
+					$loginmessage = "You have successfully logged into With Dint.<br><br>Have fun!<br><br>";
+					$_SESSION['msg'][] = $loginmessage;
+					if ( isset( $_POST['rememberme'] ) )
+					{
+						$expired = mktime(11,59,59,12,31,2030);
+						allowcookie(strtolower( str_replace(" ","_",$_POST['username'] ) ),true);
+						setcookie("username",strtolower( str_replace(" ","_",$_POST['username']) ),$expired,"/",".withdint.com");
+						setcookie("password",$_POST['password'],$expired,"/",".withdint.com");
+					}
+					updateip();
+				}
+			}
+			else
+			{
+				$loginmessage = $piece."You must first activate your account before logging in.<br><br>";
+				$_SESSION['msg'][] = $loginmessage;
+			}
+		}
+	}
+	else
+	{
+		$loginmessage = $piece."Invalid Session.<br><br>";
+		$_SESSION['msg'][] = $loginmessage;
+	}
+}
+?>

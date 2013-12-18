@@ -1,0 +1,71 @@
+﻿#EXTM3U
+#EXTINF:319,nomico - BAD APPLE!!
+\Media\Halloween Playlist\01 - BAD APPLE!!.flac
+#EXTINF:310,The Red Eyed Peas feat. Big Arrow, NTURN & SAISE - The Marisa (Dirty Spark)
+\Media\Halloween Playlist\01 - The Marisa (Dirty Spark).flac
+#EXTINF:346,shintaro - 稲田姫様に叱られるから (Happy Hardcore Mix)
+\Media\Halloween Playlist\01 - 稲田姫様に叱られるから (Happy Hardcore Mix).flac
+#EXTINF:268,DJ BUG&DJ SHIMAMURA - WITCH JUMPER (Shoujo Remix)
+\Media\Halloween Playlist\01. DJ BUG&DJ SHIMAMURA — WITCH JUMPER (Shoujo Remix).flac
+#EXTINF:369,MUZIK SERVANT - AHA☆STA
+\Media\Halloween Playlist\01. MUZIK SERVANT — AHA☆STA.flac
+#EXTINF:306,Round Wave Crusher - I'm the Terror (Halloween Edition)
+\Media\Halloween Playlist\01. Round Wave Crusher — I'm the Terror (Halloween Edition).flac
+#EXTINF:335,中恵光城 - It looks like scarlet devil ～ ct style
+\Media\Halloween Playlist\02 - It looks like scarlet devil ～ ct style.flac
+#EXTINF:232,源屋 - 神々が恋した幻想郷　-HARDCORE MIX-
+\Media\Halloween Playlist\02 - 神々が恋した幻想郷　-HARDCORE MIX-.flac
+#EXTINF:318,M-Neko - カラフル・バンザイ・ラヴ
+\Media\Halloween Playlist\02. M-Neko — カラフル・バンザイ・ラヴ.flac
+#EXTINF:326,天音 - Dirty Orange
+\Media\Halloween Playlist\02. 天音 — Dirty Orange.flac
+#EXTINF:331,源屋 - History of the Moon-UK HARDCORE MIX-
+\Media\Halloween Playlist\03 - History of the Moon-UK HARDCORE MIX-.flac
+#EXTINF:325,naizan noob - Littlebusters!!!!!!
+\Media\Halloween Playlist\03 - Littlebusters!!!!!!.flac
+#EXTINF:333,*nyo* - 契約しますん
+\Media\Halloween Playlist\04. ＊nyo＊ — 契約しますん.flac
+#EXTINF:407,Aktk - flowering or withering
+\Media\Halloween Playlist\05 - flowering or withering.flac
+#EXTINF:412,Liptonic - 800 CatF**ker
+\Media\Halloween Playlist\05. Liptonic — 800 CatF＊＊ker.flac
+#EXTINF:371,MUZIK SERVANT - Spiral Drill Power
+\Media\Halloween Playlist\05. MUZIK SERVANT — Spiral Drill Power.flac
+#EXTINF:293,Dustboxxxx - Pa-Pa-Tekno
+\Media\Halloween Playlist\06. Dustboxxxx — Pa-Pa-Tekno.flac
+#EXTINF:440,DJ Noriken - Phantom Ensemble
+\Media\Halloween Playlist\07 - Phantom Ensemble.flac
+#EXTINF:346,綾倉盟 + mican* - Saigetsu
+\Media\Halloween Playlist\08 - Saigetsu.flac
+#EXTINF:359,t+pazolite feat. リズナ - Kick ur Luv (RoughSketch ref*cks)
+\Media\Halloween Playlist\08. t+pazolite feat. リズナ — Kick ur Luv (RoughSketch ref＊cks).flac
+#EXTINF:256,USAO - ???Style
+\Media\Halloween Playlist\08. にゅうStyle.mp3
+#EXTINF:255,t+pazolite - Ghostly Parapara Ship (Horror struck Edit)
+\Media\Halloween Playlist\10 - Ghostly Parapara Ship (Horror struck Edit).flac
+#EXTINF:782,DJ-Technetium - Makina VS Hardcore VS Toho Project
+\Media\Halloween Playlist\10 - Makina VS Hardcore VS Toho Project.flac
+#EXTINF:343,DJ SHIMAMURA - Bring The Light Of Love
+\Media\Halloween Playlist\10. DJ SHIMAMURA — Bring The Light Of Love.flac
+#EXTINF:356,ExiA - Devil’s Contract
+\Media\Halloween Playlist\10. ExiA — Devil’s Contract.flac
+#EXTINF:332,jea - reproaches (live take)
+\Media\Halloween Playlist\10. jea — reproaches (live take).flac
+#EXTINF:302,Noizenecio - Wounded and Dead
+\Media\Halloween Playlist\10. Noizenecio — Wounded and Dead.flac
+#EXTINF:255,RoughSketch - System Doctor
+\Media\Halloween Playlist\10. RoughSketch — System Doctor.flac
+#EXTINF:345,tsunamix - ParameTRICK GHOST
+\Media\Halloween Playlist\11 - ParameTRICK GHOST.flac
+#EXTINF:326,DJ Noriken - Dreamin' Feelin' (P*Light Remix)
+\Media\Halloween Playlist\12. DJ Noriken — Dreamin' Feelin' (P＊Light Remix).flac
+#EXTINF:295,RoughSketch - Fuck Me Jesus
+\Media\Halloween Playlist\12. RoughSketch — Fuck Me Jesus.flac
+#EXTINF:243,Bokusatsu Shoujo Koubou - Devil Foot
+\Media\Halloween Playlist\13. Bokusatsu Shoujo Koubou — Devil Foot.flac
+#EXTINF:384,RoughSketch - Night Of Hometown
+\Media\Halloween Playlist\14. RoughSketch — Night Of Hometown.flac
+#EXTINF:39,DJ SHARPNEL - Master Maid
+\Media\Halloween Playlist\22. DJ SHARPNEL — Master Maid.flac
+#EXTINF:384,USAO - YouStyle
+\Media\Halloween Playlist\YouStyle.flac

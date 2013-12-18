@@ -1,0 +1,30 @@
+#titlescreen {
+
+}
+
+div.option{
+	font-family:'Times New Roman',serif;
+	font-weight:bold;
+	color:#96F;
+	text-shadow: 1px 1px 3px #AAC;
+	font-size:30px;
+	position:absolute;
+	width:200px;
+	text-align:center;
+	left:50px;
+	cursor:pointer;
+}
+div.option:hover{
+	color:#F60;
+}
+#titlescreen_gamestart{
+	top:440px;
+}
+
+#titlescreen_options{
+	top:480px;
+}
+
+#titlescreen_quit{
+	top:520px;
+}

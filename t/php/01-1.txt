@@ -1,0 +1,2 @@
+$MyVariable = 0;
+echo $MyVariable;
