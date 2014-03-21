@@ -1,6 +1,7 @@
 <?
 	session_start();
-	require("class/geshi.php");
+	require_once("class/database.php")
+	require_once("class/geshi.php");
 	//error_reporting(0);
 	$logoimages = explode("\n",`ls -1 logoimg`);
 	unset($logoimages[sizeof($logoimages)-1]);

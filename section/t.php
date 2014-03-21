@@ -72,7 +72,12 @@ else
 			</tr>
 			<tr class="odd">
 				<td>
-					<a href="http://engine.studiojaw.com/#">Node.js/Ember.js Application Engine</a>
+					<a href="?section=t&subsection=cirnoframework">Cirno Framework: An Object Oriented PHP and Node.js Framework</a>
+				</td>
+			</tr>
+			<tr class="even">
+				<td>
+					<a href="http://crystaljs.studiojaw.com/#">Node.js/Ember.js Application Engine</a>
 				</td>
 			</tr>
         	<tr class="odd">
@@ -114,7 +119,10 @@ else
 	
 	<b>Don't forget to also check out:</b><br>
 	<a href="?section=ui&subsection=none">User Interface Examples</a> for more code samples
-	and utilities you can use for your own project!
+	and utilities you can use for your own project!<br>
+	<br>
+	You can also check out more of my code on Git Hub!<br>
+	<a href="https://github.com/kokorohakai">My Git Hub Accouunt</a>
 <?
 }
 ?>
