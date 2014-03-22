@@ -5,7 +5,7 @@ because there is a lot of stuff I want to expose people to, and I am willing to 
 <br>
 The shows are ordered from newest to oldest, please have a look around and if you like something, don't be afraid to share the link!<br>
 <br>
-<h2>Audio Only Shows</h2>
+<h2>Shows</h2>
 <?
 $sf = new simpleframe();
 $sf -> top(); 
@@ -25,34 +25,33 @@ $sf -> top();
 	<?php
 	$files = scandir("dj/mixes/");
 	$type="even";
+	$info = $db->query('SELECT * FROM "dj_albums" ORDER BY "date" DESC');
 	foreach ( $info as $file=>$data )
 	{
-		if ( strtolower(substr($file,-3,3)) == "mp3" )
-		{
-			?>
-			<tr class="<?=$type;?>">
-				<td>
-					<a href="?section=dj&subsection=ps&file=<?=$file?>">
-						<?=( empty($info[$file] ) && empty( $info[$file]["title"] ) ) ? $file : $info[$file]["title"]; ?>
-					</a>
-				</td>
-				<td>
-					<?=( empty($info[$file] ) && empty( $info[$file]["comment"] ) ) ? "" : $info[$file]["comment"]; ?>
-				</td>
-				<td>
-					<?=( empty($info[$file] ) && empty( $info[$file]["date"] ) ) ? "Uploaded on ".date("j/n/Y",filemtime("dj/mixes/".$file)) : $info[$file]["date"]; ?>
-				</td>
-			</tr>
-			<?php
-			$type=($type=="even")?"odd":"even";
-		}
+		?>
+		<tr class="<?=$type;?>">
+			<td>
+				<a href="?section=dj&subsection=ps&id=<?=$data["id"];?>">
+					<?=( empty( $data["title"] ) ) ? $data["file"] : $data["title"]; ?>
+				</a>
+			</td>
+			<td>
+				<?=( empty( $data["comment"] ) ) ? "" : $data["comment"]; ?>
+			</td>
+			<td>
+				<?=( empty( $data["date"] ) ) ? "Uploaded on ".date("j/n/Y",filemtime("dj/mixes/".$data["file"])) : $data["date"]; ?>
+			</td>
+		</tr>
+		<?php
+		$type=($type=="even")?"odd":"even";
 	}
 	?>
 </table>
 <?
 $sf -> bottom();
 ?>
-
+<?php 
+/*
 <h2>Video with Audio Shows</h2>
 <?
 $sf = new simpleframe();
@@ -99,8 +98,9 @@ $sf -> top();
 </table>
 <?php
 $sf -> bottom();
+*/
 ?>
 <br><br>
 <div style="text-align:center;font-size:8px;font-family:'Arial',sans-serif;">
-Last updated: 12/6/2013
+Last updated: 3/21/2013
 </div>

@@ -37,7 +37,8 @@ function IconClass( id, maxwidth )
 			timeout = setTimeout( function() {shrink();}, 16);
 	}
 	
-	
-	$('img'+id).observe('mouseover',expand);
-	$('img'+id).observe('mouseout',shrink);
+	if ($('img'+id)) {
+		$('img'+id).observe('mouseover',expand);
+		$('img'+id).observe('mouseout',shrink);
+	}
 }

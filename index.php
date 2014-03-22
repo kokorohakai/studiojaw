@@ -1,7 +1,13 @@
 <?
 	session_start();
-	require_once("class/database.php")
+	require_once("class/database.php");
+	require_once("class/user.php");
+
 	require_once("class/geshi.php");
+	
+	$db = new Database();
+	$user = new User();
+	
 	//error_reporting(0);
 	$logoimages = explode("\n",`ls -1 logoimg`);
 	unset($logoimages[sizeof($logoimages)-1]);
@@ -46,6 +52,7 @@
 	if ( $_SESSION['section'] == "p" ) $_SESSION['color'] = "c0a080";
 	if ( $_SESSION['section'] == "t" ) $_SESSION['color'] = "80c0c0";
 	if ( $_SESSION['section'] == "c" ) $_SESSION['color'] = "808080";
+	if ( $_SESSION['section'] == "admin" ) $_SESSION['color'] = "CCAAFF";
 	$plugins = explode("\n",`ls -1 res/*.php`);
 	/*stupid broken syntax highlighter.*/
 	foreach ($plugins as $plugin)
@@ -158,6 +165,18 @@
 									<div class="label" id="c">contact</div>
 								</td>
 							</tr>
+							<?php
+							if ($user->loggedIn()){
+								?>
+								<tr>
+									<td class="icon">
+										<a href="?logout=true"><img src="img/icons/logout.png" class="icon" id="imglogout"></a>
+										<div class="label" id="logout">log Out</div>
+									</td>
+								</tr>
+								<?php
+							}
+							?>
 							<script type="text/javascript" language="javascript">
 								var icona = new IconClass('a',45);
 								var icondj = new IconClass('dj',200);
@@ -168,6 +187,7 @@
 								var icons = new IconClass('s',65);
 								var iconc = new IconClass('t',300);
 								var iconc = new IconClass('c',55);
+								var iconlogout = new IconClass('logout',55);
 							</script>
 						</table>
 						<img src="logoimg/<?=$logoimages[1];?>" style="position:relative;z-index:1;height:505px;" id="nextimg">
