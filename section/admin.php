@@ -10,13 +10,14 @@ if ($user->loggedIn()&&$user->isAdmin()){
 	} else {
 		$albums = $db->query('SELECT * FROM "dj_albums" ORDER BY "date" DESC');
 		?>
+		<script type="text/javascript" language="javascript" src="script/toolbox.js"></script>
 		<h1>Administrator Portal</h1><br><br>
 		<?php
 		$pf = new pictureframe();
 		$pf -> top(); 
 		?>
 			You can do the following:<br>
-			<a href="?section=admin&subsection=upload">Upload new album/show</a><br>
+			<a href="?section=admin&subsection=uploadAlbum">Upload new album/show</a><br>
 			<br>
 			<b>Edit Album Data:</b><br>
 			<table>
@@ -28,10 +29,17 @@ if ($user->loggedIn()&&$user->isAdmin()){
 							<?=$album['title'];?>
 						</td>
 						<td>
-							<a href="?section=admin&subsection=editalbum&id=<?=$album['id'];?>">&nbsp;&nbsp;&nbsp;Edit Album</a>
-						</td>
-						<td>
-							<a href="?section=admin&subsection=edittracks&id=<?=$album['id'];?>">&nbsp;&nbsp;&nbsp;Edit Tracks</a>
+							<div class="toolbox">
+								<div>
+									<a href="?section=admin&subsection=editCover&id=<?=$album['id'];?>">Edit Album Cover</a>
+								</div>
+								<div>
+									<a href="?section=admin&subsection=editAlbum&id=<?=$album['id'];?>">Edit Album Meta Data</a>
+								</div>
+								<div>
+									<a href="?section=admin&subsection=editTracks&id=<?=$album['id'];?>">Edit Track Info</a>
+								</div>
+							</div>
 						</td>
 					</tr>
 					<?php

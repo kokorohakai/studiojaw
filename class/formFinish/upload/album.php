@@ -8,11 +8,10 @@ class Upload{
 
 	private function updateDB(){
 		global $db,$e;
-		var_dump($e);
 
 		$fname = $db->sanitize($this->file['name']);
 		$data = $db->query('SELECT * FROM "dj_albums" WHERE "file" = \''.$fname.'\'');
-		if (count($data)==0){
+		if ( count($data)==0 ){
 			//only update the database if the file doesn't already exist.
 			$db->query('INSERT INTO "dj_albums" ("title","file") VALUES (\''.$fname.'\',\''.$fname.'\')');
 			$e[] = "File successfully added to database!";
@@ -35,12 +34,16 @@ class Upload{
 			"location"=>"dj/mixes/".$_FILES['uploadfile']['name']
 		);
 
-		$this->moveFile();
-		if (file_exists($this->file['location'])){
-			$this->updateDB();
-			$this->processFile();
+		if (!empty($this->file['name'])) {
+			$this->moveFile();
+			if (file_exists($this->file['location'])){
+				$this->updateDB();
+				$this->processFile();
+			} else {
+				$e[] = "Failed to upload new file!";
+			}
 		} else {
-			$e[] = "Failed to upload new file!";
+			$e[] = "Upload failed: No file specified.";
 		}
 	}
 }

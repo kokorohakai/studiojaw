@@ -1,7 +1,7 @@
 /*
 	(C) 2013 Jo-Anna Wall
 */
-function UploadApp(){
+function UploadApp(inData){
 	if (this==window){
 		console.log("Please instantiate this class properly with new.");
 		return;
@@ -14,7 +14,14 @@ function UploadApp(){
 		E['upload_button'].enable();
 		hideStatusBar();
 		E['upload_id'].value = newid;
-		//E['hiddenFrame'].src="/blank.html";
+		E['hiddenFrame'].src = "/blank.html";
+		if (options['completeScript']){
+			try{
+				eval(options['completeScript']);
+			} catch(e){
+				console.log(e);
+			}
+		}
 	}
 	/********************
 	* Private Variables 
@@ -23,7 +30,8 @@ function UploadApp(){
 		uploading=false,
 		perc=0,
 		timer=false,
-		freq=250;
+		freq=250,
+		options={};
 	/*****************
 	* Private Methods
 	*****************/
@@ -86,7 +94,7 @@ function UploadApp(){
 					},freq);
 				}
 			}
-		})
+		});
 	};
 	//system
 	function getElements(){
@@ -103,15 +111,17 @@ function UploadApp(){
 			return startUpload(e);
 		});
 	}
-	function initialize(){
+	function initialize(inData){
 		getElements();
 		setEvents();
+		options = inData;
 	}
-	initialize();
+	initialize(inData);
 }
 
 var uploadApp; //public exposure for upload child page.
 document.observe('dom:loaded',function(){
-	uploadApp = new UploadApp();
+	uploadApp = new UploadApp(UploadApp.data);
+	delete UploadApp.data;
 });
 //
