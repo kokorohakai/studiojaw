@@ -1,5 +1,5 @@
 /*
-	(C) 2013 Joe Wall
+	(C) 2013 Jo-Anna Wall
 	That's right, I got irritated with soundcloud and made my own thing.
 */
 

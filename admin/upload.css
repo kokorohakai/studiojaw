@@ -1,0 +1,31 @@
+#statusBar {
+	border:1px solid black;
+	border-radius:10px;
+	width:200px;
+	height:20px;
+	background:linear-gradient(rgba(192,192,192,.5),rgba(0,0,128,.4));
+	overflow:hidden;
+}
+#statusBarText{
+	position:relative;
+	left:0px;
+	top:-20px;
+	width:200px;
+	height:20px;
+	text-align:center;
+	font-family:sans-serif;
+	font-weight:bold;
+	font-size:14px;
+	color:white;
+	display:block;
+}
+#statusBarProgress{
+	position:relative;
+	left:0px;
+	width:0px;
+	height:20px;
+	background:linear-gradient( to right, rgba(0,0,0,.25), rgba(0,0,255,.25) );
+	border:1px solid rgba(0,0,0,.5);
+	border-radius:10px;
+	display:block;
+}
