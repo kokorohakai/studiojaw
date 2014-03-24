@@ -37,6 +37,9 @@
 
 		public function query($sql){
 			$result = pg_query($sql);
+			if (!$result){
+				return $result;
+			}
 
 			$retval = Array();
 			while ($line = @pg_fetch_array($result, null, PGSQL_ASSOC)) {

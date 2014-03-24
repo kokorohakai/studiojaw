@@ -20,6 +20,7 @@ if (file_exists("class/formFinish/".$_REQUEST['t'].".php")){
 					parent.alert(msg);
 				}
 				parent.uploadApp.stopUpload('<?=uniqid("");?>');
+				window.location = "/blank.html";
 			</script>
 		</head>
 	</html>
