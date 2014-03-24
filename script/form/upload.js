@@ -1,5 +1,5 @@
 /*
-	(C) 2013 Jo-Anna Wall
+	(C) 2014 Jo-Anna Wall
 */
 function UploadApp(inData){
 	if (this==window){
@@ -112,9 +112,9 @@ function UploadApp(inData){
 		});
 	}
 	function initialize(inData){
+		options = inData;
 		getElements();
 		setEvents();
-		options = inData;
 	}
 	initialize(inData);
 }

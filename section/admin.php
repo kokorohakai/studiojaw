@@ -37,7 +37,7 @@ if ($user->loggedIn()&&$user->isAdmin()){
 									<a href="?section=admin&subsection=editAlbum&id=<?=$album['id'];?>">Edit Album Meta Data</a>
 								</div>
 								<div>
-									<a href="?section=admin&subsection=editTracks&id=<?=$album['id'];?>">Edit Track Info</a>
+									<a href="?section=admin&subsection=editTracks&fid=<?=$album['id'];?>">Edit Track Info</a>
 								</div>
 							</div>
 						</td>

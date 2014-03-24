@@ -60,7 +60,7 @@
 					<td>
 					</td>
 					<td>
-						<input type="submit" value="<?=$this->options['submitCaption'];?>" id="table_formSubmit">
+						<input type="submit" value="<?=$this->options['submitCaption'];?>" id="foreignTable_formSubmit">
 					</td>
 				</tr>
 			</table>

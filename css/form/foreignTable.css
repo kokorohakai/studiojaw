@@ -1,0 +1,58 @@
+.odd {
+	background:rgba(255,255,255,.75);
+}
+.even{
+	background:rgba(225,225,255,.75);
+}
+.foreignTable_formData{
+	font-family:'Arial',sans-serif;
+	font-size:10px;
+	line-height:11px;
+	width:50px;
+}
+textarea.foreignTable_formData{
+	width: 250px;
+	height: 80px;
+}
+table.master .lefttile {
+	width: 0px;
+}
+table.master .rightgutter {
+	width:0px;
+}
+table.master .thebody {
+	width:100%;
+}
+
+table.foreignTable thead {
+	background:black;
+}
+table.foreignTable thead th {
+	color:white;
+	text-align:center;
+	padding:2px;
+	font-size:14px;
+	font-weight:bold;
+	font-family:'Arial',sans-serif;
+}
+
+table.foreignTable td.action{
+	vertical-align:middle;
+	text-align:center;
+}
+
+table.foreignTable td .changed{
+	border:1px solid red;
+	background:#FEE;
+}
+#foreignTable_status {
+	display:inline;
+}
+#foreignTable_toolbox {
+	display:inline-block;
+}
+#foreignTable_toolbar {
+	position:absolute;
+	top:0px;
+	right:0px;
+}

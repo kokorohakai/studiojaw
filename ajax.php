@@ -5,11 +5,12 @@
 
 	$db = new Database();
 	$user = new User();
-	$output = array();
-
-	if (file_exists("ajax/".$_REQUEST['a'].".php")){
-		require("ajax/".$_REQUEST['a'].".php");
-	} else {
-		$output['err'][] = "Invalid or no action specified.";
+	if ($user->isAdmin()){
+		$output = array();
+		if (file_exists("ajax/".$_REQUEST['a'].".php")){
+			require("ajax/".$_REQUEST['a'].".php");
+		} else {
+			$output['err'][] = "Invalid or no action specified.";
+		}
+		echo json_encode($output);
 	}
-	echo json_encode($output);

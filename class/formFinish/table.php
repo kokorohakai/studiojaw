@@ -1,8 +1,5 @@
 <?php
-magic_quotes_runtime(false);
 class FormFinish{
-	private $file = array();
-
 	private function updateDB(){
 		global $db;
 		//var_dump($_REQUEST);
@@ -15,8 +12,10 @@ class FormFinish{
 		unset($columnInfo);
 
 		echo "<br>";
-		$sql = 'UPDATE "'.$_GET['table'].'" SET ';
+		$table = $db->sanitize($_GET['table']);
+		$sql = 'UPDATE "'.$table.'" SET ';
 		foreach ($_POST as $column=>$data){
+			$column = $db->sanitize($column);
 			$data = $db->sanitize($data);
 			$sql.='"'.$column.'" = ';
 			switch($c[$column]['data_type']){
